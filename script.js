@@ -6,8 +6,12 @@ window.onload = function() {
 
     function handleImage(imgSource) {
         const img = new Image();
+        // 關鍵：解決手機版 Canvas 跨域安全限制
+        img.crossOrigin = "anonymous"; 
+        
         img.onload = function() {
             originalImage = img;
+            // 修正：針對手機視網膜螢幕，確保畫布寬高設定正確
             canvas.width = img.width;
             canvas.height = img.height;
             draw(); 
@@ -32,50 +36,57 @@ window.onload = function() {
         const sat = document.getElementById('sat').value;
         const temp = document.getElementById('temp').value;
 
+        // 清除畫布，準備重新繪製
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // 套用濾鏡 (針對手機瀏覽器優化語法)
         ctx.filter = `brightness(${100 + parseInt(ev)}%) saturate(${sat}%) hue-rotate(${temp}deg) contrast(110%)`;
+        
         ctx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
     }
 
-    // --- 底片模擬按鈕邏輯 ---
+    // --- 改進點：針對手機觸控優化 ---
+    const controls = ['ev', 'sat', 'temp'];
+    controls.forEach(id => {
+        const el = document.getElementById(id);
+        // 同時監聽 input 和 change，確保手機拉桿一動就有反應
+        el.addEventListener('input', draw);
+        el.addEventListener('change', draw); 
+    });
+
+    // 模式按鈕 (針對手機點擊延遲優化)
     document.querySelectorAll('.preset-item').forEach(button => {
         button.addEventListener('click', (e) => {
-            // 切換按鈕亮起狀態
             document.querySelectorAll('.preset-item').forEach(b => b.classList.remove('active'));
             e.target.classList.add('active');
 
             const preset = e.target.dataset.preset;
-            
-            // 根據不同底片設定數值
             if (preset === 'kodak') {
-                document.getElementById('ev').value = 10;
-                document.getElementById('sat').value = 140;
-                document.getElementById('temp').value = 10; // 偏暖
+                updateInputs(10, 140, 10);
             } else if (preset === 'fuji') {
-                document.getElementById('ev').value = 5;
-                document.getElementById('sat').value = 110;
-                document.getElementById('temp').value = -15; // 偏冷
+                updateInputs(5, 110, -15);
             } else if (preset === 'bw') {
-                document.getElementById('ev').value = 0;
-                document.getElementById('sat').value = 0; // 黑白
-                document.getElementById('temp').value = 0;
-            } else { // Classic 重置
-                document.getElementById('ev').value = 0;
-                document.getElementById('sat').value = 100;
-                document.getElementById('temp').value = 0;
+                updateInputs(0, 0, 0);
+            } else {
+                updateInputs(0, 100, 0);
             }
-            draw(); // 立即套用
+            draw();
         });
     });
 
-    ['ev', 'sat', 'temp'].forEach(id => {
-        document.getElementById(id).addEventListener('input', draw);
-    });
+    function updateInputs(e, s, t) {
+        document.getElementById('ev').value = e;
+        document.getElementById('sat').value = s;
+        document.getElementById('temp').value = t;
+    }
 
+    // 儲存圖片 (手機端下載優化)
     document.getElementById('saveBtn').addEventListener('click', () => {
         const link = document.createElement('a');
-        link.download = 'retro-photo.png';
-        link.href = canvas.toDataURL();
+        link.download = 'retro-photo-' + Date.now() + '.png';
+        link.href = canvas.toDataURL("image/png");
+        document.body.appendChild(link); // 某些手機瀏覽器需要這行
         link.click();
+        document.body.removeChild(link);
     });
 };
