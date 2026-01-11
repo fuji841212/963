@@ -41,23 +41,30 @@ window.onload = function() {
         applyFilters();
     }
 
-    // 4. 濾鏡核心邏輯
+    // ... (前面代碼不變)
+
     function applyFilters() {
         if (!originalImage) return;
 
-        const ev = document.getElementById('ev')?.value || 0;
-        const sat = document.getElementById('sat')?.value || 100;
-        const temp = document.getElementById('temp')?.value || 0;
+        const ev = parseInt(document.getElementById('ev').value);
+        const sat = parseInt(document.getElementById('sat').value);
+        const temp = parseInt(document.getElementById('temp').value);
 
+        // 重設畫布狀態
+        ctx.save(); 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
         // 套用濾鏡
-        ctx.filter = `
-            brightness(${100 + parseInt(ev)}%) 
-            saturate(${sat}%) 
-            hue-rotate(${temp}deg)
-            contrast(110%)
-        `;
+        ctx.filter = `brightness(${100 + ev}%) saturate(${sat}%) hue-rotate(${temp}deg) contrast(110%)`;
+        
+        // 畫出圖片
+        ctx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
+        ctx.restore();
+        
+        console.log("🎨 畫面已更新");
+    }
+
+// ... (後面代碼不變)
         
         ctx.drawImage(originalImage, 0, 0);
         console.log("濾鏡套用成功: EV:", ev, "SAT:", sat, "TEMP:", temp);
@@ -86,3 +93,4 @@ window.onload = function() {
         link.click();
     });
 };
+
