@@ -1,71 +1,88 @@
+// 確保所有程式碼在網頁載入完成後才執行
 window.onload = function() {
-    console.log("🚀 模擬器核心啟動");
+    console.log("網頁載入完成，啟動模擬器...");
 
     const canvas = document.getElementById('mainCanvas');
     const ctx = canvas.getContext('2d');
     const imageUpload = document.getElementById('imageUpload');
+    const watermark = document.getElementById('watermark');
     let originalImage = null;
 
-    // 預設圖片路徑
+    // 1. 自動載入預設圖片
     const defaultImg = new Image();
     defaultImg.src = 'my-pic.jpg'; 
-
     defaultImg.onload = () => {
-        console.log("✅ 圖片載入成功");
         originalImage = defaultImg;
-        updateCanvasSize();
+        resizeAndDraw();
     };
 
-    // 上傳功能
+    // 2. 使用者上傳處理
     imageUpload.addEventListener('change', (e) => {
         const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const img = new Image();
-                img.onload = () => {
-                    originalImage = img;
-                    updateCanvasSize();
-                };
-                img.src = event.target.result;
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+                originalImage = img;
+                resizeAndDraw();
             };
-            reader.readAsDataURL(file);
-        }
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
     });
 
-    // 關鍵：更新畫布尺寸並立刻渲染
-    function updateCanvasSize() {
+    // 3. 調整畫布大小並繪製
+    function resizeAndDraw() {
         if (!originalImage) return;
-        // 設定畫布的「畫素大小」等於「圖片大小」
+        // 讓畫布跟隨圖片大小，但在螢幕上不超過視窗寬度
         canvas.width = originalImage.width;
         canvas.height = originalImage.height;
-        applyFilters(); 
+        applyFilters();
     }
 
+    // 4. 濾鏡核心邏輯
     function applyFilters() {
         if (!originalImage) return;
 
-        // 取得三個拉桿的數值
-        const ev = parseInt(document.getElementById('ev').value);
-        const sat = parseInt(document.getElementById('sat').value);
-        const temp = parseInt(document.getElementById('temp').value);
+        const ev = document.getElementById('ev')?.value || 0;
+        const sat = document.getElementById('sat')?.value || 100;
+        const temp = document.getElementById('temp')?.value || 0;
 
-        // 重置畫布與濾鏡
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        // 使用 CSS 濾鏡語法
-        ctx.filter = `brightness(${100 + ev}%) saturate(${sat}%) hue-rotate(${temp}deg) contrast(110%)`;
+        // 套用濾鏡
+        ctx.filter = `
+            brightness(${100 + parseInt(ev)}%) 
+            saturate(${sat}%) 
+            hue-rotate(${temp}deg)
+            contrast(110%)
+        `;
         
-        // 畫出圖片
         ctx.drawImage(originalImage, 0, 0);
-        console.log(`🎨 更新成功: EV=${ev}, SAT=${sat}, TEMP=${temp}`);
+        console.log("濾鏡套用成功: EV:", ev, "SAT:", sat, "TEMP:", temp);
     }
 
-    // 監聽所有拉桿 (使用 'input' 事件保證即時反應)
-    const allRanges = document.querySelectorAll('input[type=range]');
-    allRanges.forEach(range => {
-        range.addEventListener('input', () => {
-            applyFilters();
+    // 5. 監聽所有拉桿 (確保在畫布渲染後也能運作)
+    const inputs = document.querySelectorAll('input[type=range]');
+    inputs.forEach(input => {
+        input.addEventListener('input', applyFilters);
+    });
+
+    // 6. 水印開關
+    const toggleBtn = document.getElementById('toggleWatermark');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', (e) => {
+            watermark.classList.toggle('hidden');
+            e.target.innerText = watermark.classList.contains('hidden') ? 'OFF' : 'ON';
         });
+    }
+
+    // 7. 儲存圖片
+    document.getElementById('saveBtn').addEventListener('click', () => {
+        const link = document.createElement('a');
+        link.download = 'retro-photo.png';
+        link.href = canvas.toDataURL();
+        link.click();
     });
 };
