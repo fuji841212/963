@@ -4,12 +4,10 @@ window.onload = function() {
     const imageUpload = document.getElementById('imageUpload');
     let originalImage = null;
 
-    // 通用的圖片載入與處理
     function handleImage(imgSource) {
         const img = new Image();
         img.onload = function() {
             originalImage = img;
-            // 設定畫布內部解析度為圖片原始尺寸
             canvas.width = img.width;
             canvas.height = img.height;
             draw(); 
@@ -17,10 +15,8 @@ window.onload = function() {
         img.src = imgSource;
     }
 
-    // 1. 預設載入 (請確認 GitHub 有這張圖)
     handleImage('my-pic.jpg');
 
-    // 2. 上傳載入
     imageUpload.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -30,36 +26,55 @@ window.onload = function() {
         }
     });
 
-    // 3. 繪製與濾鏡
     function draw() {
         if (!originalImage) return;
-
         const ev = document.getElementById('ev').value;
         const sat = document.getElementById('sat').value;
         const temp = document.getElementById('temp').value;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // 套用底片模擬濾鏡
-        ctx.filter = `
-            brightness(${100 + parseInt(ev)}%) 
-            saturate(${sat}%) 
-            hue-rotate(${temp}deg)
-            contrast(110%)
-        `;
-        
+        ctx.filter = `brightness(${100 + parseInt(ev)}%) saturate(${sat}%) hue-rotate(${temp}deg) contrast(110%)`;
         ctx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
     }
 
-    // 4. 監聽拉桿連動
+    // --- 底片模擬按鈕邏輯 ---
+    document.querySelectorAll('.preset-item').forEach(button => {
+        button.addEventListener('click', (e) => {
+            // 切換按鈕亮起狀態
+            document.querySelectorAll('.preset-item').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+
+            const preset = e.target.dataset.preset;
+            
+            // 根據不同底片設定數值
+            if (preset === 'kodak') {
+                document.getElementById('ev').value = 10;
+                document.getElementById('sat').value = 140;
+                document.getElementById('temp').value = 10; // 偏暖
+            } else if (preset === 'fuji') {
+                document.getElementById('ev').value = 5;
+                document.getElementById('sat').value = 110;
+                document.getElementById('temp').value = -15; // 偏冷
+            } else if (preset === 'bw') {
+                document.getElementById('ev').value = 0;
+                document.getElementById('sat').value = 0; // 黑白
+                document.getElementById('temp').value = 0;
+            } else { // Classic 重置
+                document.getElementById('ev').value = 0;
+                document.getElementById('sat').value = 100;
+                document.getElementById('temp').value = 0;
+            }
+            draw(); // 立即套用
+        });
+    });
+
     ['ev', 'sat', 'temp'].forEach(id => {
         document.getElementById(id).addEventListener('input', draw);
     });
 
-    // 5. 儲存圖片
     document.getElementById('saveBtn').addEventListener('click', () => {
         const link = document.createElement('a');
-        link.download = 'retro-sim-photo.png';
+        link.download = 'retro-photo.png';
         link.href = canvas.toDataURL();
         link.click();
     });
