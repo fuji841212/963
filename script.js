@@ -4,40 +4,34 @@ window.onload = function() {
     const imageUpload = document.getElementById('imageUpload');
     let originalImage = null;
 
-    // 1. 預設圖片載入
-    const defaultImg = new Image();
-    defaultImg.src = 'my-pic.jpg'; 
-    defaultImg.onload = () => {
-        originalImage = defaultImg;
-        render();
-    };
+    // 通用的圖片載入與處理
+    function handleImage(imgSource) {
+        const img = new Image();
+        img.onload = function() {
+            originalImage = img;
+            // 設定畫布內部解析度為圖片原始尺寸
+            canvas.width = img.width;
+            canvas.height = img.height;
+            draw(); 
+        };
+        img.src = imgSource;
+    }
 
-    // 2. 上傳功能
+    // 1. 預設載入 (請確認 GitHub 有這張圖)
+    handleImage('my-pic.jpg');
+
+    // 2. 上傳載入
     imageUpload.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = (event) => {
-                const img = new Image();
-                img.onload = () => {
-                    originalImage = img;
-                    render();
-                };
-                img.src = event.target.result;
-            };
+            reader.onload = (ev) => handleImage(ev.target.result);
             reader.readAsDataURL(file);
         }
     });
 
-    function render() {
-        if (!originalImage) return;
-        // 重要：這兩行決定了圖片的「清晰度」
-        canvas.width = originalImage.width;
-        canvas.height = originalImage.height;
-        applyFilters();
-    }
-
-    function applyFilters() {
+    // 3. 繪製與濾鏡
+    function draw() {
         if (!originalImage) return;
 
         const ev = document.getElementById('ev').value;
@@ -46,35 +40,27 @@ window.onload = function() {
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        // 濾鏡效果
-        ctx.filter = `brightness(${100 + parseInt(ev)}%) saturate(${sat}%) hue-rotate(${temp}deg) contrast(110%)`;
+        // 套用底片模擬濾鏡
+        ctx.filter = `
+            brightness(${100 + parseInt(ev)}%) 
+            saturate(${sat}%) 
+            hue-rotate(${temp}deg)
+            contrast(110%)
+        `;
         
-        // 將原圖完整畫入畫布
         ctx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
-        console.log("🎨 濾鏡更新完成");
     }
 
-    // 監聽所有拉桿
+    // 4. 監聽拉桿連動
     ['ev', 'sat', 'temp'].forEach(id => {
-        document.getElementById(id).addEventListener('input', applyFilters);
+        document.getElementById(id).addEventListener('input', draw);
     });
 
-    // 預設模式按鈕功能 (CLASSIC, KODAK 等)
-    document.querySelectorAll('.preset-item').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const preset = e.target.dataset.preset;
-            if(preset === 'bw') {
-                document.getElementById('sat').value = 0;
-            } else if(preset === 'warm') {
-                document.getElementById('temp').value = 20;
-                document.getElementById('sat').value = 120;
-            } else {
-                // 重置
-                document.getElementById('ev').value = 0;
-                document.getElementById('sat').value = 100;
-                document.getElementById('temp').value = 0;
-            }
-            applyFilters();
-        });
+    // 5. 儲存圖片
+    document.getElementById('saveBtn').addEventListener('click', () => {
+        const link = document.createElement('a');
+        link.download = 'retro-sim-photo.png';
+        link.href = canvas.toDataURL();
+        link.click();
     });
 };
