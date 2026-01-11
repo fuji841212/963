@@ -1,8 +1,5 @@
-// 強制在控制台印出訊息，確認檔案有讀取
-console.log("--- 程式檔案已成功讀取 ---");
-
-const startSimulator = () => {
-    console.log("--- 模擬器邏輯啟動 ---");
+window.onload = function() {
+    console.log("🚀 模擬器核心已啟動");
 
     const canvas = document.getElementById('mainCanvas');
     const ctx = canvas.getContext('2d');
@@ -10,23 +7,26 @@ const startSimulator = () => {
     const watermark = document.getElementById('watermark');
     let originalImage = null;
 
-    // 1. 預設圖片載入
+    // --- 這裡是最重要的地方：請確認檔名！ ---
+    const imgName = 'my-pic.jpg'; 
+    // -------------------------------------
+
     const defaultImg = new Image();
-    defaultImg.src = 'my-pic.jpg'; // 請確保 GitHub 倉庫裡有這張圖
-    
+    defaultImg.src = imgName;
+
     defaultImg.onload = () => {
-        console.log("✅ 預設圖片載入成功");
+        console.log("✅ 成功抓到圖片：" + imgName);
         originalImage = defaultImg;
         render();
     };
 
     defaultImg.onerror = () => {
-        console.log("❌ 預設圖片載入失敗，請確認檔名是否正確");
+        console.error("❌ 找不到圖片！請檢查：");
+        console.error("1. GitHub 上是否有一個檔案叫 " + imgName);
+        console.error("2. 大小寫是否完全一致（.jpg 還是 .JPG？）");
     };
 
-    // 2. 渲染與濾鏡
     function render() {
-        if (!originalImage) return;
         canvas.width = originalImage.width;
         canvas.height = originalImage.height;
         applyFilters();
@@ -39,56 +39,27 @@ const startSimulator = () => {
         const temp = document.getElementById('temp').value;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // 套用濾鏡
-        ctx.filter = `
-            brightness(${100 + parseInt(ev)}%) 
-            saturate(${sat}%) 
-            hue-rotate(${temp}deg)
-            contrast(110%)
-        `;
-        
+        ctx.filter = `brightness(${100 + parseInt(ev)}%) saturate(${sat}%) hue-rotate(${temp}deg) contrast(110%)`;
         ctx.drawImage(originalImage, 0, 0);
-        console.log("🎨 畫面已更新");
+        console.log("🎨 畫面已渲染");
     }
 
-    // 3. 事件監聽
-    imageUpload.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const img = new Image();
-                img.onload = () => {
-                    originalImage = img;
-                    render();
-                };
-                img.src = event.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-
+    // 監聽拉桿
     ['ev', 'sat', 'temp'].forEach(id => {
         document.getElementById(id).addEventListener('input', applyFilters);
     });
 
+    // 水印
     document.getElementById('toggleWatermark').addEventListener('click', (e) => {
         watermark.classList.toggle('hidden');
         e.target.innerText = watermark.classList.contains('hidden') ? 'OFF' : 'ON';
     });
 
+    // 存檔
     document.getElementById('saveBtn').addEventListener('click', () => {
         const link = document.createElement('a');
-        link.download = 'retro-photo.png';
+        link.download = 'my-retro-photo.png';
         link.href = canvas.toDataURL();
         link.click();
     });
 };
-
-// 確保 HTML 跑完才執行 JS
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", startSimulator);
-} else {
-    startSimulator();
-}
