@@ -81,4 +81,3 @@ document.getElementById('saveBtn').addEventListener('click', () => {
 // --- Firebase 預留區 ---
 
 // 你可以在此加入 firebase.initializeApp(config) 來同步資料
-
