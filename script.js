@@ -1,65 +1,71 @@
 window.onload = function() {
-    console.log("🚀 模擬器核心已啟動");
+    console.log("🚀 模擬器核心啟動");
 
     const canvas = document.getElementById('mainCanvas');
     const ctx = canvas.getContext('2d');
     const imageUpload = document.getElementById('imageUpload');
-    const watermark = document.getElementById('watermark');
     let originalImage = null;
 
-    // --- 這裡是最重要的地方：請確認檔名！ ---
-    const imgName = 'my-pic.jpg'; 
-    // -------------------------------------
-
+    // 預設圖片路徑
     const defaultImg = new Image();
-    defaultImg.src = imgName;
+    defaultImg.src = 'my-pic.jpg'; 
 
     defaultImg.onload = () => {
-        console.log("✅ 成功抓到圖片：" + imgName);
+        console.log("✅ 圖片載入成功");
         originalImage = defaultImg;
-        render();
+        updateCanvasSize();
     };
 
-    defaultImg.onerror = () => {
-        console.error("❌ 找不到圖片！請檢查：");
-        console.error("1. GitHub 上是否有一個檔案叫 " + imgName);
-        console.error("2. 大小寫是否完全一致（.jpg 還是 .JPG？）");
-    };
+    // 上傳功能
+    imageUpload.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    originalImage = img;
+                    updateCanvasSize();
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
 
-    function render() {
+    // 關鍵：更新畫布尺寸並立刻渲染
+    function updateCanvasSize() {
+        if (!originalImage) return;
+        // 設定畫布的「畫素大小」等於「圖片大小」
         canvas.width = originalImage.width;
         canvas.height = originalImage.height;
-        applyFilters();
+        applyFilters(); 
     }
 
     function applyFilters() {
         if (!originalImage) return;
-        const ev = document.getElementById('ev').value;
-        const sat = document.getElementById('sat').value;
-        const temp = document.getElementById('temp').value;
 
+        // 取得三個拉桿的數值
+        const ev = parseInt(document.getElementById('ev').value);
+        const sat = parseInt(document.getElementById('sat').value);
+        const temp = parseInt(document.getElementById('temp').value);
+
+        // 重置畫布與濾鏡
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.filter = `brightness(${100 + parseInt(ev)}%) saturate(${sat}%) hue-rotate(${temp}deg) contrast(110%)`;
+        
+        // 使用 CSS 濾鏡語法
+        ctx.filter = `brightness(${100 + ev}%) saturate(${sat}%) hue-rotate(${temp}deg) contrast(110%)`;
+        
+        // 畫出圖片
         ctx.drawImage(originalImage, 0, 0);
-        console.log("🎨 畫面已渲染");
+        console.log(`🎨 更新成功: EV=${ev}, SAT=${sat}, TEMP=${temp}`);
     }
 
-    // 監聽拉桿
-    ['ev', 'sat', 'temp'].forEach(id => {
-        document.getElementById(id).addEventListener('input', applyFilters);
-    });
-
-    // 水印
-    document.getElementById('toggleWatermark').addEventListener('click', (e) => {
-        watermark.classList.toggle('hidden');
-        e.target.innerText = watermark.classList.contains('hidden') ? 'OFF' : 'ON';
-    });
-
-    // 存檔
-    document.getElementById('saveBtn').addEventListener('click', () => {
-        const link = document.createElement('a');
-        link.download = 'my-retro-photo.png';
-        link.href = canvas.toDataURL();
-        link.click();
+    // 監聽所有拉桿 (使用 'input' 事件保證即時反應)
+    const allRanges = document.querySelectorAll('input[type=range]');
+    allRanges.forEach(range => {
+        range.addEventListener('input', () => {
+            applyFilters();
+        });
     });
 };
