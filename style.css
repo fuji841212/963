@@ -27,6 +27,29 @@ body { background-color: #121212; color: white; font-family: sans-serif; margin:
     cursor: pointer;
     border-radius: 4px;
 }
+/* 讓拉桿在手機上更好按 */
+input[type=range] {
+    -webkit-appearance: none; /* 移除系統預設樣式 */
+    height: 15px;
+    background: #333;
+    border-radius: 10px;
+    outline: none;
+    margin: 20px 0; /* 增加間距防止誤觸 */
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 25px;
+    height: 25px;
+    background: #ff6600;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* 防止手機縮放干擾 */
+body {
+    touch-action: manipulation;
+}
 
 .preset-item.active {
     background: #ff6600;
@@ -40,3 +63,4 @@ input[type=range] { width: 100%; margin-top: 8px; }
     background: #ff6600; color: white; border: none; padding: 15px 30px;
     border-radius: 50px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px;
 }
+
