@@ -1,51 +1,42 @@
-body {
-    background-color: #121212;
-    color: white;
-    font-family: sans-serif;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-}
+body { background-color: #121212; color: white; font-family: sans-serif; margin: 0; display: flex; justify-content: center; }
+.app-container { width: 100%; max-width: 500px; padding: 20px; text-align: center; }
 
-.app-container {
-    width: 100%;
-    max-width: 500px;
-    padding: 20px;
-    text-align: center;
-}
-
-/* 這是最重要的地方 */
 #mainCanvas {
     display: block;
-    width: 100% !important;   /* 寬度撐滿容器 */
-    height: auto !important;  /* 比例不變形 */
+    width: 100% !important;
+    height: auto !important;
     background-color: #222;
-    border: 1px solid #444;
     margin: 20px 0;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border: 1px solid #444;
 }
 
-.control-group {
-    margin: 15px 0;
+/* 模式按鈕樣式 */
+.preset-menu {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    justify-content: space-around;
+    margin-bottom: 20px;
+    gap: 5px;
 }
 
-input[type=range] {
-    width: 100%;
-    margin-top: 8px;
+.preset-item {
+    background: #333;
+    color: #888;
+    border: none;
+    padding: 8px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 4px;
 }
 
-.hidden { display: none; }
-
-.save-fab {
+.preset-item.active {
     background: #ff6600;
     color: white;
-    border: none;
-    padding: 15px 30px;
-    border-radius: 50px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 20px;
+}
+
+.control-group { margin: 15px 0; text-align: left; }
+input[type=range] { width: 100%; margin-top: 8px; }
+
+.save-fab {
+    background: #ff6600; color: white; border: none; padding: 15px 30px;
+    border-radius: 50px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px;
 }
