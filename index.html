@@ -11,16 +11,16 @@
 <div class="app-container">
     <header>
         <h1>RETRO<span>SIM</span></h1>
+        <main id="preview-area">
+        <canvas id="mainCanvas"></canvas>
+        <div id="watermark" class="hidden">OCT 24 1998</div>
+    </main>
         <label class="upload-btn">
             UPLOAD PHOTO
             <input type="file" id="imageUpload" accept="image/*" hidden>
         </label>
     </header>
 
-    <main id="preview-area">
-        <canvas id="mainCanvas"></canvas>
-        <div id="watermark" class="hidden">OCT 24 1998</div>
-    </main>
 
     <section class="preset-menu">
         <button class="preset-item active" data-preset="classic">CLASSIC</button>
@@ -58,6 +58,7 @@
 <script src="script.js?v=1"></script>
 </body>
 </html>
+
 
 
 
