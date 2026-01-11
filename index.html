@@ -1,60 +1,88 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RetroFilm Sim | 黑橘底片模擬</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+// 確保網頁所有內容都讀取完才開始執行
+window.addEventListener('load', function() {
+    console.log("模擬器已啟動");
 
-<div class="app-container">
-    <header>
-        <h1>RETRO<span>SIM</span></h1>
-        <label class="upload-btn">
-            UPLOAD PHOTO
-            <input type="file" id="imageUpload" accept="image/*" hidden>
-        </label>
-    </header>
+    const canvas = document.getElementById('mainCanvas');
+    const ctx = canvas.getContext('2d');
+    const imageUpload = document.getElementById('imageUpload');
+    const watermark = document.getElementById('watermark');
+    let originalImage = null;
 
-    <main id="preview-area">
-        <canvas id="mainCanvas"></canvas>
-        <div id="watermark" class="hidden">OCT 24 1998</div>
-    </main>
+    // --- 1. 自動載入預設圖片 ---
+    const defaultImg = new Image();
+    defaultImg.src = 'my-pic.jpg'; // ⚠️ 檢查 GitHub 上的檔名是否完全一致
+    defaultImg.onload = () => {
+        originalImage = defaultImg;
+        initCanvas();
+    };
 
-    <section class="preset-menu">
-        <button class="preset-item active" data-preset="classic">CLASSIC</button>
-        <button class="preset-item" data-preset="kodak">KODAK 400</button>
-        <button class="preset-item" data-preset="fuji">FUJI-A</button>
-        <button class="preset-item" data-preset="bw">B&W NOIR</button>
-        <button class="preset-item" data-preset="warm">WARM VIBE</button>
-        <button class="preset-item" data-preset="teal">TEAL ORANGE</button>
-    </section>
+    // --- 2. 使用者上傳圖片處理 ---
+    imageUpload.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+                originalImage = img;
+                initCanvas();
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
 
-    <section class="controls">
-        <div class="control-group">
-            <label>EV (曝光)</label>
-            <input type="range" id="ev" min="-50" max="50" value="0">
-        </div>
-        <div class="control-group">
-            <label>SAT (飽和度)</label>
-            <input type="range" id="sat" min="0" max="200" value="100">
-        </div>
-        <div class="control-group">
-            <label>TEMP (冷暖)</label>
-            <input type="range" id="temp" min="-50" max="50" value="0">
-        </div>
-        <div class="control-group">
-            <label>水印</label>
-            <button id="toggleWatermark" class="mini-btn">OFF</button>
-        </div>
-    </section>
+    // --- 3. 初始化畫布大小 ---
+    function initCanvas() {
+        if (!originalImage) return;
+        canvas.width = originalImage.width;
+        canvas.height = originalImage.height;
+        applyFilters();
+    }
 
-    <button id="saveBtn" class="save-fab">SAVE</button>
-</div>
+    // --- 4. 濾鏡核心計算 (EV, SAT, TEMP) ---
+    function applyFilters() {
+        if (!originalImage) return;
 
-<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
-<script src="script.js"></script>
-</body>
-</html>
+        const ev = document.getElementById('ev').value;
+        const sat = document.getElementById('sat').value;
+        const temp = document.getElementById('temp').value;
+
+        // 清除畫布
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // 套用複合濾鏡：亮度(EV)、飽和度(SAT)、冷暖(TEMP)
+        // 使用 hue-rotate 近似處理冷暖色調
+        ctx.filter = `
+            brightness(${100 + parseInt(ev)}%) 
+            saturate(${sat}%) 
+            hue-rotate(${temp}deg)
+            contrast(105%)
+        `;
+        
+        ctx.drawImage(originalImage, 0, 0);
+    }
+
+    // --- 5. 監聽拉桿變化 ---
+    const controls = ['ev', 'sat', 'temp'];
+    controls.forEach(id => {
+        document.getElementById(id).addEventListener('input', applyFilters);
+    });
+
+    // --- 6. 水印按鈕控制 ---
+    const toggleWatermark = document.getElementById('toggleWatermark');
+    if (toggleWatermark) {
+        toggleWatermark.addEventListener('click', (e) => {
+            watermark.classList.toggle('hidden');
+            e.target.innerText = watermark.classList.contains('hidden') ? 'OFF' : 'ON';
+        });
+    }
+
+    // --- 7. 儲存圖片功能 ---
+    document.getElementById('saveBtn').addEventListener('click', () => {
+        const link = document.createElement('a');
+        link.download = 'retro-photo.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    });
+});
