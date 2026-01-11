@@ -4,7 +4,7 @@ const ctx = canvas.getContext('2d');
 
 // 建立一個圖片物件
 const defaultImg = new Image();
-defaultImg.src = 'your-image.jpg'; // 👈 這裡換成你上傳到 GitHub 的圖片檔名
+defaultImg.src = 'my-pic.jpg'; // 
 
 // 當圖片載入完成後，把它畫在畫布上
 defaultImg.onload = function() {
@@ -81,3 +81,4 @@ document.getElementById('saveBtn').addEventListener('click', () => {
 // --- Firebase 預留區 ---
 
 // 你可以在此加入 firebase.initializeApp(config) 來同步資料
+
