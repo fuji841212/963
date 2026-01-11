@@ -1,0 +1,134 @@
+:root {
+    --black: #050505;
+    --dark: #121212;
+    --orange: #FF6600;
+    --grey: #333;
+}
+
+body {
+    background-color: var(--black);
+    color: white;
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    display: flex;
+    justify-content: center;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 500px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+header {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0,0,0,0.8);
+}
+
+header h1 {
+    font-size: 1.2rem;
+    color: var(--orange);
+    margin: 0;
+    letter-spacing: 3px;
+}
+
+header h1 span { color: white; }
+
+/* 圖片預覽 */
+#preview-area {
+    flex-grow: 1;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+#mainCanvas {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+/* 時間水印 */
+#watermark {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    color: var(--orange);
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.5);
+    opacity: 0.8;
+}
+
+.hidden { display: none; }
+
+/* 底部選單 */
+.preset-menu {
+    display: flex;
+    overflow-x: auto;
+    padding: 10px;
+    background: var(--dark);
+    gap: 10px;
+}
+
+.preset-item {
+    background: var(--black);
+    border: 1px solid var(--grey);
+    color: #888;
+    padding: 10px 20px;
+    white-space: nowrap;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.preset-item.active {
+    border-color: var(--orange);
+    color: var(--orange);
+    box-shadow: inset 0 0 5px var(--orange);
+}
+
+/* 控制區 */
+.controls {
+    padding: 20px;
+    background: var(--dark);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.control-group label {
+    display: block;
+    font-size: 0.7rem;
+    color: #888;
+    margin-bottom: 5px;
+}
+
+input[type=range] {
+    width: 100%;
+    accent-color: var(--orange);
+}
+
+/* 另存按鈕 (FAB) */
+.save-fab {
+    position: absolute;
+    bottom: 100px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--orange);
+    color: black;
+    border: none;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(255,102,0,0.4);
+}

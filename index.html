@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetroFilm Sim | 黑橘底片模擬</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <h1>RETRO<span>SIM</span></h1>
+        <label class="upload-btn">
+            UPLOAD PHOTO
+            <input type="file" id="imageUpload" accept="image/*" hidden>
+        </label>
+    </header>
+
+    <main id="preview-area">
+        <canvas id="mainCanvas"></canvas>
+        <div id="watermark" class="hidden">OCT 24 1998</div>
+    </main>
+
+    <section class="preset-menu">
+        <button class="preset-item active" data-preset="classic">CLASSIC</button>
+        <button class="preset-item" data-preset="kodak">KODAK 400</button>
+        <button class="preset-item" data-preset="fuji">FUJI-A</button>
+        <button class="preset-item" data-preset="bw">B&W NOIR</button>
+        <button class="preset-item" data-preset="warm">WARM VIBE</button>
+        <button class="preset-item" data-preset="teal">TEAL ORANGE</button>
+    </section>
+
+    <section class="controls">
+        <div class="control-group">
+            <label>EV (曝光)</label>
+            <input type="range" id="ev" min="-50" max="50" value="0">
+        </div>
+        <div class="control-group">
+            <label>SAT (飽和度)</label>
+            <input type="range" id="sat" min="0" max="200" value="100">
+        </div>
+        <div class="control-group">
+            <label>TEMP (冷暖)</label>
+            <input type="range" id="temp" min="-50" max="50" value="0">
+        </div>
+        <div class="control-group">
+            <label>水印</label>
+            <button id="toggleWatermark" class="mini-btn">OFF</button>
+        </div>
+    </section>
+
+    <button id="saveBtn" class="save-fab">SAVE</button>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
