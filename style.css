@@ -52,13 +52,21 @@ header h1 span { color: white; }
 }
 
 #mainCanvas {
-    display: block !important;
-    width: 100% !important;   /* 寬度填滿父容器 */
-    max-width: 500px;        /* 限制最大寬度，避免太大看不見按鈕 */
-    height: auto !important;  /* 高度自動縮放，不變形 */
-    margin: 0 auto;          /* 居中 */
-    background-color: #000;
-    border: 2px solid #ff6600;
+    display: block;
+    width: 100% !important;   /* 寬度撐滿容器 */
+    height: auto !important;  /* 高度自動 */
+    max-width: 100%;          /* 絕不超出螢幕 */
+    background-color: #222;   /* 底色 */
+    margin: 10px 0;
+    image-rendering: auto;    /* 確保圖片不模糊 */
+}
+
+#preview-area {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: visible;
 }
 
 /* 確保預覽區域會自動縮小 */
@@ -147,4 +155,5 @@ input[type=range] {
     cursor: pointer;
     box-shadow: 0 5px 15px rgba(255,102,0,0.4);
 }
+
 
