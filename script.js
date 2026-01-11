@@ -1,9 +1,9 @@
-// 使用最保險的啟動方式
-console.log("JS 檔案已讀取");
+// 強制在控制台印出訊息，確認檔案有讀取
+console.log("--- 程式檔案已成功讀取 ---");
 
-function startApp() {
-    console.log("模擬器邏輯啟動中...");
-    
+const startSimulator = () => {
+    console.log("--- 模擬器邏輯啟動 ---");
+
     const canvas = document.getElementById('mainCanvas');
     const ctx = canvas.getContext('2d');
     const imageUpload = document.getElementById('imageUpload');
@@ -12,7 +12,7 @@ function startApp() {
 
     // 1. 預設圖片載入
     const defaultImg = new Image();
-    defaultImg.src = 'my-pic.jpg'; // 請再次確認檔名!
+    defaultImg.src = 'my-pic.jpg'; // 請確保 GitHub 倉庫裡有這張圖
     
     defaultImg.onload = () => {
         console.log("✅ 預設圖片載入成功");
@@ -21,27 +21,10 @@ function startApp() {
     };
 
     defaultImg.onerror = () => {
-        console.log("❌ 預設圖片載入失敗，請確認倉庫裡是否有 my-pic.jpg");
+        console.log("❌ 預設圖片載入失敗，請確認檔名是否正確");
     };
 
-    // 2. 上傳功能
-    imageUpload.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const img = new Image();
-                img.onload = () => {
-                    console.log("✅ 使用者圖片載入成功");
-                    originalImage = img;
-                    render();
-                };
-                img.src = event.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-
+    // 2. 渲染與濾鏡
     function render() {
         if (!originalImage) return;
         canvas.width = originalImage.width;
@@ -56,30 +39,56 @@ function startApp() {
         const temp = document.getElementById('temp').value;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.filter = `brightness(${100 + parseInt(ev)}%) saturate(${sat}%) hue-rotate(${temp}deg) contrast(110%)`;
+        
+        // 套用濾鏡
+        ctx.filter = `
+            brightness(${100 + parseInt(ev)}%) 
+            saturate(${sat}%) 
+            hue-rotate(${temp}deg)
+            contrast(110%)
+        `;
+        
         ctx.drawImage(originalImage, 0, 0);
-        console.log("🎨 已渲染濾鏡");
+        console.log("🎨 畫面已更新");
     }
 
-    // 3. 監聽拉桿
+    // 3. 事件監聽
+    imageUpload.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    originalImage = img;
+                    render();
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
     ['ev', 'sat', 'temp'].forEach(id => {
         document.getElementById(id).addEventListener('input', applyFilters);
     });
 
-    // 4. 水印
     document.getElementById('toggleWatermark').addEventListener('click', (e) => {
         watermark.classList.toggle('hidden');
         e.target.innerText = watermark.classList.contains('hidden') ? 'OFF' : 'ON';
     });
 
-    // 5. 存檔
     document.getElementById('saveBtn').addEventListener('click', () => {
         const link = document.createElement('a');
-        link.download = 'photo.png';
+        link.download = 'retro-photo.png';
         link.href = canvas.toDataURL();
         link.click();
     });
-}
+};
 
-// 執行
-startApp();
+// 確保 HTML 跑完才執行 JS
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", startSimulator);
+} else {
+    startSimulator();
+}
