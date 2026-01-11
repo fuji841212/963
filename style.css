@@ -133,14 +133,23 @@ input[type=range] {
     box-shadow: 0 5px 15px rgba(255,102,0,0.4);
 }
 /* 強制讓畫布顯示出來 */
-canvas#mainCanvas {
+#mainCanvas {
     display: block !important;
-    width: 100% !important;
-    height: auto !important;
-    min-height: 200px;
-    background-color: #222; /* 沒圖時會顯示深灰色 */
-    border: 2px solid #ff6600; /* 先加一個橘色邊框，確認它在哪裡 */
-    margin: 20px auto;
+    width: 100% !important; /* 強制填滿容器寬度 */
+    max-width: 100%;    /* 不超出父層 */
+    height: auto !important; /* 依比例縮放高度 */
+    min-height: 250px;  /* 至少要有 250px 高度 */
+    background-color: #000;
+    border: 2px solid #ff6600; 
+    touch-action: none; /* 防止手機操作時頁面亂跳 */
+}
+
+/* 確保容器寬度足夠 */
+.app-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 10px;
 }
 
 /* 確保預覽區域沒有把內容藏起來 */
@@ -159,4 +168,5 @@ canvas#mainCanvas {
 .hidden {
     display: none !important;
 }
+
 
